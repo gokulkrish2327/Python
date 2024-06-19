@@ -1,0 +1,116 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+data = pd.read_csv('C:\\Users\\gokul\\Desktop\\soft skill\\unified\\Financial Analytics Dataset.csv')
+data.head(3)
+
+
+plt.figure(figsize=(10, 6))
+plt.hist(data['Mar Cap - Crore'], bins=30, edgecolor='black')
+plt.xlabel('Market Cap (Crore)')
+plt.ylabel('Number of Companies')
+plt.title('Distribution of Market Capitalization')
+plt.show()
+
+
+top_5_market_cap = data.nlargest(5, 'Mar Cap - Crore')
+print("Top 5 companies by Market Cap:")
+print(top_5_market_cap[['Name', 'Mar Cap - Crore']])
+
+
+
+plt.figure(figsize=(10, 6))
+plt.bar(top_5_market_cap['Name'], top_5_market_cap['Mar Cap - Crore'], color='skyblue')
+plt.xlabel('Company Name')
+plt.ylabel('Market Cap (Crore)')
+plt.title('Top 5 Companies by Market Cap')
+plt.xticks(rotation=45)  # Rotate x-axis labels for better readability
+plt.tight_layout()
+plt.show()
+
+bank_data = data[data['Name'].str.contains('Bank', case=False, na=False)]
+
+top_5_bank_market_cap = bank_data.nlargest(5, 'Mar Cap - Crore')
+print("Top 5 banks by Market Cap:")
+print(top_5_bank_market_cap[['Name', 'Mar Cap - Crore']])
+
+plt.figure(figsize=(10, 6))
+plt.bar(top_5_bank_market_cap['Name'], top_5_bank_market_cap['Mar Cap - Crore'], color='skyblue')
+plt.xlabel('Company Name')
+plt.ylabel('Market Cap (Crore)')
+plt.title('Top 5 Banks by Market Cap')
+plt.xticks(rotation=45)  # Rotate x-axis labels for better readability
+plt.tight_layout()
+plt.show()
+
+top_5_sales_qtr = data.nlargest(5, 'Sales Qtr - Crore')
+print("Top 5 companies by Quarterly Sales:")
+print(top_5_sales_qtr[['Name', 'Sales Qtr - Crore']])
+
+# Visualize the top 5 companies by Quarterly Sales
+plt.figure(figsize=(10, 6))
+plt.bar(top_5_sales_qtr['Name'], top_5_sales_qtr['Sales Qtr - Crore'], color='skyblue')
+plt.xlabel('Company Name')
+plt.ylabel('Quarterly Sales (Crore)')
+plt.title('Top 5 Companies by Quarterly Sales')
+plt.xticks(rotation=45)  # Rotate x-axis labels for better readability
+plt.tight_layout()
+plt.show()
+
+
+
+
+
+top_1_market_cap = data.nlargest(5, 'Mar Cap - Crore')
+top_1_sales_qtr = data.nlargest(5, 'Sales Qtr - Crore')
+
+# Find intersection of top 1 by Market Cap and top 1 by Quarterly Sales
+top_1_combined = pd.merge(top_1_market_cap, top_1_sales_qtr, how='inner', on='Name')
+top_1_combined = top_1_combined[['Name', 'Mar Cap - Crore_x', 'Sales Qtr - Crore_y']]
+top_1_combined.columns = ['Name', 'Market Cap (Crore)', 'Sales Qtr (Crore)']
+
+print("Top 1 company with highest Market Cap and Quarterly Sales:")
+print(top_1_combined)
+plt.figure(figsize=(12, 6))
+
+plt.bar(top_1_combined['Name'], top_1_combined['Market Cap (Crore)'],
+        alpha=0.7, label='Market Cap', color='b')
+plt.bar(top_1_combined['Name'], top_1_combined['Sales Qtr (Crore)'],
+        alpha=0.7, label='Sales Qtr', color='g')
+
+plt.bar(top_1_combined['Name'], top_1_combined['Market Cap (Crore)'],
+        alpha=0.7, label='Market Cap', color='b')
+
+# Plot Sales Qtr
+plt.bar(top_1_combined['Name'], top_1_combined['Sales Qtr (Crore)'],
+        alpha=0.7, label='Sales Qtr', color='g')
+
+plt.xlabel('Company Name')
+plt.ylabel('Amount (Crore)')
+plt.title('1st Company with Highest Market Cap and Quarterly Sales')
+plt.xticks(rotation=45)
+plt.legend()
+plt.tight_layout()
+plt.show()
+
+
+# Calculate correlation between Market Cap and Quarterly Sales
+correlation = data['Mar Cap - Crore'].corr(data['Sales Qtr - Crore'])
+
+print(f"Correlation between Market Cap and Quarterly Sales: {correlation:.2f}")
+
+
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Load your data (replace 'data.csv' with your actual file path)
+data = pd.read_csv('C:\\Users\\gokul\\Desktop\\soft skill\\unified\\Financial Analytics Dataset.csv')
+
+# Calculate correlation matrix
+correlation_matrix = data.corr()
+
+# Plot heatmap
+plt.figure(figsize=(10, 8))
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt='.2f', linewidths=0.5)
+plt.title('Correlation Heatmap')
+plt.show()
