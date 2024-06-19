@@ -1,0 +1,154 @@
+import pandas as pd
+import plotly.express as px
+
+#importing 
+data = pd.read_csv('C:\\Users\\gokul\\Desktop\\soft skill\\unified\\Attrition data.csv')
+data.head(4)
+
+#defining data
+def get_attrition_rate(data):
+    total_left = len(data[data['Attrition'] == 'Yes'])
+    average_employees = data['EmployeeCount'].mean()
+    return (total_left / average_employees) * 100  
+
+overall_attrition_rate = get_attrition_rate(data.copy())
+# attrition by dept
+attrition_by_dept = (
+    data.groupby('Department')['Attrition'].value_counts().unstack(fill_value=0).fillna(0)
+)
+attrition_by_dept_pct = (attrition_by_dept / attrition_by_dept.sum(axis=0)) * 100
+
+
+#attrition by level
+attrition_by_level = (
+    data.groupby('JobLevel')['Attrition'].value_counts().unstack(fill_value=0).fillna(0)
+)
+attrition_by_level_pct = (attrition_by_level / attrition_by_level.sum(axis=0)) * 100
+
+#by age grp
+data['AgeGroup'] = pd.cut(data['Age'], bins=[20, 30, 40, 50, 100])
+attrition_by_age = data.groupby(data['AgeGroup'].astype(str))['Attrition'].value_counts().unstack(fill_value=0).fillna(0)
+attrition_by_age_pct = (attrition_by_age / attrition_by_age.sum(axis=0)) * 100
+
+#by gender
+attrition_by_gender = data.groupby('Gender')['Attrition'].value_counts().unstack(fill_value=0)
+attrition_by_gender_pct = (attrition_by_gender / attrition_by_gender.sum(axis=0)) * 100
+
+#by marital status
+attrition_by_marital_status = data.groupby('MaritalStatus')['Attrition'].value_counts().unstack(fill_value=0).fillna(0)
+attrition_by_marital_status_pct = (attrition_by_marital_status / attrition_by_marital_status.sum(axis=0)) * 100
+
+# Creating Plotly Express figures
+overall_rate = px.bar(
+    x=['Overall Attrition Rate'],
+    y=[overall_attrition_rate],
+    title="Overall Attrition Rate (%)",
+    labels={'x': '', 'y': 'Attrition Rate (%)'},
+)
+
+overall_rate.show()
+
+dept_attrition = px.bar(
+    attrition_by_dept_pct,
+    x=attrition_by_dept_pct.index,
+    y="Yes",
+    title="Attrition Rate by Department (%)",
+    barmode="stack",
+    labels={'x': 'Department', 'y': 'Attrition Rate (%)'}
+)
+dept_attrition.show()
+
+level_attrition = px.bar(
+    attrition_by_level_pct,
+    x=attrition_by_level_pct.index,
+    y="Yes",
+    title="Attrition Rate by Job Level (%)",
+    barmode="stack",
+    labels={'x': 'Job Level', 'y': 'Attrition Rate (%)'}
+)
+level_attrition.show()
+
+age_attrition = px.bar(
+    attrition_by_age_pct,
+    x=attrition_by_age_pct.index,
+    y="Yes",
+    title="Attrition Rate by Age Group (%)",
+    barmode="stack",
+    labels={'x': 'Age Group', 'y': 'Attrition Rate (%)'}
+)
+age_attrition.show()
+
+gender_attrition = px.pie(
+    names=attrition_by_gender.index,
+    values=attrition_by_gender["Yes"],
+    title="Attrition Rate by Gender (%)"
+)
+gender_attrition.show()
+
+marital_status_attrition = px.bar(
+    attrition_by_marital_status_pct,
+    x=attrition_by_marital_status_pct.index,
+    y="Yes",
+    title="Attrition Rate by Marital Status (%)",
+    barmode="stack",
+    labels={'x': 'Marital Status', 'y': 'Attrition Rate (%)'}
+)
+marital_status_attrition.show()
+
+performance_by_department = data.groupby(['Department', 'PerformanceRating']).size().reset_index(name='Count')
+
+performance_rating = px.bar(
+    performance_by_department,
+    x='Department',
+    y='Count',
+    color='PerformanceRating',
+    title='Performance Rating by Department',
+    labels={'Count': 'Number of Employees'},
+    barmode='group'
+)
+performance_rating.show()
+
+attrition_by_jobsatisfaction = data.groupby(['JobSatisfaction', 'Attrition']).size().reset_index(name='Count')
+
+attrition_jobsatisfaction = px.bar(
+    attrition_by_jobsatisfaction,
+    x='JobSatisfaction',
+    y='Count',
+    color='Attrition',
+    title='Attrition by Job Satisfaction',
+    labels={'Count': 'Number of Employees'},
+    barmode='group'
+)
+
+# Display the figure
+attrition_jobsatisfaction.show()
+
+attrition_by_education_field = data.groupby(['EducationField', 'Attrition']).size().reset_index(name='Count')
+
+# Create a bar chart using Plotly Express
+attrition_education_field = px.bar(
+    attrition_by_education_field,
+    x='EducationField',
+    y='Count',
+    color='Attrition',
+    title='Attrition by EducationField',
+    labels={'Count': 'Number of Employees'},
+    barmode='group'
+)
+
+attrition_education_field.show()
+
+attrition_by_DistanceFromHome = data.groupby(['DistanceFromHome', 'Attrition']).size().reset_index(name='Count')
+
+# Create a bar chart using Plotly Express
+attrition_DistanceFromHome = px.bar(
+    attrition_by_DistanceFromHome,
+    x='DistanceFromHome',
+    y='Count',
+    color='Attrition',
+    title='Attrition by DistanceFromHome',
+    labels={'Count': 'Number of Employees'},
+    barmode='group'
+)
+
+attrition_DistanceFromHome.show()
